@@ -55,7 +55,7 @@ module power_box(size=[55, 54, 55], step=[20, 27], bolt_size = "m4", back_lip = 
       corner_r = min(back_size.x, back_size.y)/2,
       front_size = [step.x+corner_r, back_size.y, step.y]
   ){
-    unf_C14Socket(rotation=[0, -90, 0], location=[-$over+wall, 7, 30], fastener=c14_fastener, bolt=c14_fastener_size, support_skin="vertical", support_skin_t=support_skin){
+    unf_C14Socket(rotation=[0, -90, 0], location=[-$over+wall, 7, wall+1], fastener=c14_fastener, bolt=c14_fastener_size, support_skin="vertical", restriction_l=wall+1, restriction_r=0, support_skin_t=support_skin){
       color("Blue"){
 	difference(){
 	  main_shape(back_size=back_size, front_size=front_size, corner_r=corner_r);
@@ -94,4 +94,5 @@ module power_box(size=[55, 54, 55], step=[20, 27], bolt_size = "m4", back_lip = 
 power_box(size = size,
 	  bolt_size = bolt_size,
 	  wall = wall);
+
 
