@@ -24,32 +24,52 @@ use <libraries/UnfyOpenSCADLib/cutouts/unfy_popins.scad>
 use <libraries/UnfyOpenSCADLib/cutouts/unfy_dhole.scad>
 use <libraries/UnfyOpenSCADLib/unfy_cablemanagement.scad>
 
-bolt_size = "#6"; // ["M3", "M4", "#4", "#6", "#8"]
-c14_fastener = "Heatset"; //["Heatset", "HexNut", "PlainHole"]
-c14_fastener_size = "M4"; // ["M3", "M4", "#4", "#6", "#8"]
+part = "TopSupplyCornerBracket"; // ["PowerSocketBox", "TopSupplyCornerBracket"]
 
-fuse_holder_hole_diameter = 12;
-fuse_holder_outer_diameter = 14;
-fuse_holder_spacing = 4; //[0:0.5:5]
-fuse_holder_hole_shape = "circle";// ["circle", "d", "doubled"]
-fuse_holder_flat_width = 5;
-fuse_holder_rotation = 0; //[0:360]
-
-top_cable_d = 7.5;
-top_cable_bolt = "M3"; //["M3", "M4", "#6"]
-bottom_cable_d = 7.5;
-bottom_cable_bolt = "M3"; //["M3", "M4", "#6"]
-
-wall = 4;//[2:0.1:5]
 support_skin = 0.6;
 
 body_color = "Blue"; //["Lavender", "Thistle", "Plum", "Violet", "Orchid", "Fuchsia", "Magenta", "MediumOrchid", "MediumPurple", "BlueViolet", "DarkViolet", "DarkOrchid", "DarkMagenta", "Purple", "Indigo", "DarkSlateBlue", "SlateBlue", "MediumSlateBlue", "Pink", "LightPink", "HotPink", "DeepPink", "MediumVioletRed", "PaleVioletRed", "Aqua", "Cyan", "LightCyan", "PaleTurquoise", "Aquamarine", "Turquoise", "MediumTurquoise", "DarkTurquoise", "CadetBlue", "SteelBlue", "LightSteelBlue", "PowderBlue", "LightBlue", "SkyBlue", "LightSkyBlue", "DeepSkyBlue", "DodgerBlue", "CornflowerBlue", "RoyalBlue", "Blue", "MediumBlue", "DarkBlue", "Navy", "MidnightBlue", "IndianRed", "LightCoral", "Salmon", "DarkSalmon", "LightSalmon", "Red", "Crimson", "FireBrick", "DarkRed", "GreenYellow", "Chartreuse", "LawnGreen", "Lime", "LimeGreen", "PaleGreen", "LightGreen", "MediumSpringGreen", "SpringGreen", "MediumSeaGreen", "SeaGreen", "ForestGreen", "Green", "DarkGreen", "YellowGreen", "OliveDrab", "Olive", "DarkOliveGreen", "MediumAquamarine", "DarkSeaGreen", "LightSeaGreen", "DarkCyan", "Teal", "LightSalmon", "Coral", "Tomato", "OrangeRed", "DarkOrange", "Orange", "Gold", "Yellow", "LightYellow", "LemonChiffon", "LightGoldenrodYellow", "PapayaWhip", "Moccasin", "PeachPuff", "PaleGoldenrod", "Khaki", "DarkKhaki", "Cornsilk", "BlanchedAlmond", "Bisque", "NavajoWhite", "Wheat", "BurlyWood", "Tan", "RosyBrown", "SandyBrown", "Goldenrod", "DarkGoldenrod", "Peru", "Chocolate", "SaddleBrown", "Sienna", "Brown", "Maroon", "White", "Snow", "Honeydew", "MintCream", "Azure", "AliceBlue", "GhostWhite", "WhiteSmoke", "Seashell", "Beige", "OldLace", "FloralWhite", "Ivory", "AntiqueWhite", "Linen", "LavenderBlush", "MistyRose", "Gainsboro", "LightGrey", "Silver", "DarkGray", "Gray", "DimGray", "LightSlateGray", "SlateGray", "DarkSlateGray", "Black"]
 support_color = "Yellow"; //["Lavender", "Thistle", "Plum", "Violet", "Orchid", "Fuchsia", "Magenta", "MediumOrchid", "MediumPurple", "BlueViolet", "DarkViolet", "DarkOrchid", "DarkMagenta", "Purple", "Indigo", "DarkSlateBlue", "SlateBlue", "MediumSlateBlue", "Pink", "LightPink", "HotPink", "DeepPink", "MediumVioletRed", "PaleVioletRed", "Aqua", "Cyan", "LightCyan", "PaleTurquoise", "Aquamarine", "Turquoise", "MediumTurquoise", "DarkTurquoise", "CadetBlue", "SteelBlue", "LightSteelBlue", "PowderBlue", "LightBlue", "SkyBlue", "LightSkyBlue", "DeepSkyBlue", "DodgerBlue", "CornflowerBlue", "RoyalBlue", "Blue", "MediumBlue", "DarkBlue", "Navy", "MidnightBlue", "IndianRed", "LightCoral", "Salmon", "DarkSalmon", "LightSalmon", "Red", "Crimson", "FireBrick", "DarkRed", "GreenYellow", "Chartreuse", "LawnGreen", "Lime", "LimeGreen", "PaleGreen", "LightGreen", "MediumSpringGreen", "SpringGreen", "MediumSeaGreen", "SeaGreen", "ForestGreen", "Green", "DarkGreen", "YellowGreen", "OliveDrab", "Olive", "DarkOliveGreen", "MediumAquamarine", "DarkSeaGreen", "LightSeaGreen", "DarkCyan", "Teal", "LightSalmon", "Coral", "Tomato", "OrangeRed", "DarkOrange", "Orange", "Gold", "Yellow", "LightYellow", "LemonChiffon", "LightGoldenrodYellow", "PapayaWhip", "Moccasin", "PeachPuff", "PaleGoldenrod", "Khaki", "DarkKhaki", "Cornsilk", "BlanchedAlmond", "Bisque", "NavajoWhite", "Wheat", "BurlyWood", "Tan", "RosyBrown", "SandyBrown", "Goldenrod", "DarkGoldenrod", "Peru", "Chocolate", "SaddleBrown", "Sienna", "Brown", "Maroon", "White", "Snow", "Honeydew", "MintCream", "Azure", "AliceBlue", "GhostWhite", "WhiteSmoke", "Seashell", "Beige", "OldLace", "FloralWhite", "Ivory", "AntiqueWhite", "Linen", "LavenderBlush", "MistyRose", "Gainsboro", "LightGrey", "Silver", "DarkGray", "Gray", "DimGray", "LightSlateGray", "SlateGray", "DarkSlateGray", "Black"]
 
-$over = 0.01;
-$fn = $preview ? 36 : 360;
+/* [Power Socket Box] */
+psb_bolt_size = "#6"; // ["M3", "M4", "#4", "#6", "#8"]
+psb_socket_fastener = "Heatset"; //["Heatset", "HexNut", "PlainHole"]
+psb_socket_fastener_size = "M4"; // ["M3", "M4", "#4", "#6", "#8"]
 
-module power_box(step=[20, 27], bolt_size = "m4", back_lip = 5, top_cable_d, top_cable_bolt, bottom_cable_d, bottom_cable_bolt, wall=2){
+psb_fuse_holder_hole_diameter = 12;
+psb_fuse_holder_outer_diameter = 14;
+psb_fuse_holder_spacing = 4; //[0:0.5:5]
+psb_fuse_holder_hole_shape = "circle";// ["circle", "d", "doubled"]
+psb_fuse_holder_flat_width = 5;
+psb_fuse_holder_rotation = 0; //[0:360]
+
+psb_top_cable_d = 7.5;
+psb_top_cable_bolt = "M3"; //["M3", "M4", "#6"]
+psb_bottom_cable_d = 7.5;
+psb_bottom_cable_bolt = "M3"; //["M3", "M4", "#6"]
+
+/* [ advanced ] */
+wall = 4;
+$fn = $preview ? 36 : 360;
+$over = 0.01;
+
+module power_box(step=[20, 27],
+		 bolt_size = "m4",
+		 back_lip = 5,
+		 top_cable_d,
+		 top_cable_bolt,
+		 bottom_cable_d,
+		 bottom_cable_bolt,
+		 socket_fastener="Heatset",
+		 socket_fastener_size="M4",
+		 fuse_holder_hole_diameter=12,
+		 fuse_holder_outer_diameter=14,
+		 fuse_holder_spacing=4,
+		 fuse_holder_hole_shape="circle",
+		 fuse_holder_flat_width=5,
+		 fuse_holder_rotation=0,
+		 support_skin=0.6,
+		 wall=4){
 
   module main_shape(back_size, front_size, corner_r, back_corner_r, wall){
     let(back_size = [max(wall, back_size.x), max(wall, back_size.y), max(wall, back_size.z)],
@@ -110,7 +130,7 @@ module power_box(step=[20, 27], bolt_size = "m4", back_lip = 5, top_cable_d, top
       unf_cableClip(location=[front_size.x+back_size.x, (3/4)*front_size.y, 0], rotation=[180, -90, 0], cable_d=top_cable_d, bolt=top_cable_bolt, hole_ext=front_size.x, body_color=body_color, support="none", center=false)
       
       // Socket
-      unf_C14Socket(rotation=[0, 90, 180], location=[wall-$over, (unf_c14_size().y+front_size.y)/2, unf_c14_size().x+c14_zpos], fastener=c14_fastener, bolt=c14_fastener_size, support_skin="vertical", restriction_l=fuse_holder_spacing, restriction_r=c14_zpos, body_color=body_color, support_color=support_color, support_skin_t=support_skin, wall=wall)
+      unf_C14Socket(rotation=[0, 90, 180], location=[wall-$over, (unf_c14_size().y+front_size.y)/2, unf_c14_size().x+c14_zpos], fastener=socket_fastener, bolt=socket_fastener_size, support_skin="vertical", restriction_l=fuse_holder_spacing, restriction_r=c14_zpos, body_color=body_color, support_color=support_color, support_skin_t=support_skin, wall=wall)
 
       {
       
@@ -119,18 +139,18 @@ module power_box(step=[20, 27], bolt_size = "m4", back_lip = 5, top_cable_d, top
 	//Main Body
 	difference(){
 	  //outer main body
-	  main_shape(back_size=back_size, front_size=front_size, corner_r=corner_r, back_corner_r=back_corner_r, wall);
+	  main_shape(back_size=back_size, front_size=front_size, corner_r=corner_r, back_corner_r=back_corner_r, wall=wall);
 	  //cutout inside, except bottom
-	  translate([wall, wall, wall]){
+	    translate([wall, wall, wall]){
 	    main_shape(back_size = [max($over, back_size.x-(2*wall)), max($over, back_size.y-(2*wall)), max($over, back_size.z-(2*wall))],
 		       front_size = [max($over, front_size.x-(2*wall)), max($over, front_size.y-(2*wall)), max($over, front_size.z-(2*wall))],
-		       corner_r = corner_r, back_corner_r = back_corner_r, wall);
+		       corner_r = corner_r, back_corner_r = back_corner_r, wall=wall);
 	  }
 	  //cutout middle of bottom
 	  translate([2*wall, 2*wall, -$over]){
 	    main_shape(back_size = [max($over, back_size.x-(4*wall)), max($over, back_size.y-(4*wall)), max($over, back_size.z-wall+$over)],
 		       front_size = [max($over, front_size.x-(2*wall)), max($over, front_size.y-(4*wall)), max($over, front_size.z-wall+$over)],
-		       corner_r = corner_r, back_corner_r = back_corner_r, wall);
+		       corner_r = corner_r, back_corner_r = back_corner_r, wall=wall);
 	  }
 	  //cut back out of main section
 	  translate([back_lip+wall, back_size.y-(wall+$over), max(wall, back_lip)]){
@@ -144,7 +164,7 @@ module power_box(step=[20, 27], bolt_size = "m4", back_lip = 5, top_cable_d, top
 	  //Fuse Holder
 	  translate([wall+$over, back_size.y/2, fuse_holder_zpos+(fuse_holder_outer_diameter/2)]){
 	    rotate([90, "doubled"==fuse_holder_hole_shape?90:0, -90]){
-	      #unf_DHole(diameter=fuse_holder_hole_diameter, shape=fuse_holder_hole_shape, flat_width=fuse_holder_flat_width, angle=fuse_holder_rotation, z=wall+(2*$over));
+	      unf_DHole(diameter=fuse_holder_hole_diameter, shape=fuse_holder_hole_shape, flat_width=fuse_holder_flat_width, angle=fuse_holder_rotation, z=wall+(2*$over));
 	    }
 	  }
 	}
@@ -167,7 +187,7 @@ module power_box(step=[20, 27], bolt_size = "m4", back_lip = 5, top_cable_d, top
       }
       
       //Support Skin
-      if (0 < support_skin){
+      if ($over < support_skin){
 	color(support_color, alpha=0.5){
 	  //hold up corner of step
 	  translate([back_size.x-back_lip-wall, back_size.y-wall, 0]){
@@ -188,11 +208,20 @@ module power_box(step=[20, 27], bolt_size = "m4", back_lip = 5, top_cable_d, top
 }
 
 
-power_box(bolt_size = bolt_size,
-	  top_cable_d = top_cable_d,
-	  top_cable_bolt = top_cable_bolt,
-	  bottom_cable_d = bottom_cable_d,
-	  bottom_cable_bolt = bottom_cable_bolt,
+power_box(bolt_size = psb_bolt_size,
+	  top_cable_d = psb_top_cable_d,
+	  top_cable_bolt = psb_top_cable_bolt,
+	  bottom_cable_d = psb_bottom_cable_d,
+	  bottom_cable_bolt = psb_bottom_cable_bolt,
+	  socket_fastener=psb_socket_fastener,
+	  socket_fastener_size=psb_socket_fastener,
+	  fuse_holder_hole_diameter = psb_fuse_holder_hole_diameter,
+	  fuse_holder_outer_diameter = psb_fuse_holder_outer_diameter,
+	  fuse_holder_spacing = psb_fuse_holder_spacing,
+	  fuse_holder_hole_shape = psb_fuse_holder_hole_shape,
+	  fuse_holder_flat_width = psb_fuse_holder_flat_width,
+	  fuse_holder_rotation = psb_fuse_holder_rotation,
+	  support_skin = support_skin,
 	  wall = wall);
 
 
