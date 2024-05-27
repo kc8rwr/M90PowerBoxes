@@ -51,9 +51,9 @@ $fn = $preview ? 36 : 360;
 
 module power_box(size=[55, 54, 55], step=[40, 27], bolt_size = "m4", back_lip = 5, top_cable_d, top_cable_bolt, bottom_cable_d, bottom_cable_bolt, wall=2){
 
-  module main_shape(back_size, front_size, corner_r){
+  module main_shape(back_size, front_size, corner_r, back_corner_r){
     edge_r = corner_r/4;
-    corners = [0, corner_r, 0, 0];
+    corners = [back_corner_r, corner_r, 0, 0];
     edge_rs=[edge_r, edge_r, 0, edge_r, 0, 0, 0, 0];
     unf_roundedCuboid(size=back_size, corners=corners, edge_r=edge_rs);
     translate([back_size.x-corner_r, 0, 0]){
@@ -93,12 +93,13 @@ module power_box(size=[55, 54, 55], step=[40, 27], bolt_size = "m4", back_lip = 
       back_x = size.x - tab_length,
       back_y = size.y - tab_length,
       corner_r = min(back_x, back_y)/2,
+      back_corner_r = corner_r / 4,
       back_z = c14_zpos + unf_c14_size().x + wall + fuse_holder_outer_diameter + wall + wall,
       back_size = [back_x, back_y, back_z],
       front_size = [step.x+corner_r-tab_length, back_y, step.y]
   ){
     // Top Cable Clip
-    unf_cableClip(location=[back_size.x-(corner_r/2), back_size.y-wall-(top_cable_d/2), back_size.z], rotation=[0, 0, -90], cable_d=top_cable_d, bolt=top_cable_bolt, hole_ext=back_size.z, support="vertical", support_skin=support_skin, body_color=body_color, support_color=support_color)
+    unf_cableClip(location=[back_size.x-(corner_r/2), back_size.y-wall-(top_cable_d/2), back_size.z], rotation=[0, 0, -90], cable_d=top_cable_d, bolt=top_cable_bolt, hole_ext=back_size.z-(2*wall), support="vertical", support_skin=support_skin, body_color=body_color, support_color=support_color)
 
       // Bottom Cable Clip
       unf_cableClip(location=[front_size.x+back_size.x-tab_length-1, (3/4)*front_size.y, 0], rotation=[180, -90, 0], cable_d=top_cable_d, bolt=top_cable_bolt, hole_ext=front_size.x, body_color=body_color, support="none", center=false)
@@ -110,17 +111,27 @@ module power_box(size=[55, 54, 55], step=[40, 27], bolt_size = "m4", back_lip = 
 
 	//Main Body
 	difference(){
-	  main_shape(back_size=back_size, front_size=front_size, corner_r=corner_r);
-	  translate([wall, wall, -$over]){
-	    main_shape(back_size = [back_size.x-(2*wall), back_size.y-(2*wall), back_size.z-wall+$over],
-		       front_size = [front_size.x-(2*wall), front_size.y-(2*wall), front_size.z-wall+$over],
-		       corner_r = corner_r);
+	  //outer main body
+	  main_shape(back_size=back_size, front_size=front_size, corner_r=corner_r, back_corner_r=back_corner_r);
+	  //cutout inside, except bottom
+	  translate([wall, wall, wall]){
+	    main_shape(back_size = [back_size.x-(2*wall), back_size.y-(2*wall), back_size.z-(2*wall)],
+		       front_size = [front_size.x-(2*wall), front_size.y-(2*wall), front_size.z-(2*wall)],
+		       corner_r = corner_r, back_corner_r = back_corner_r);
 	  }
-	  translate([back_lip+wall, back_size.y-(wall+$over), -$over]){
-	    cube([back_size.x-(2*wall)-(2*back_lip), wall+(2*$over), back_size.z+$over-max(wall, back_lip)]);
+	  //cutout middle of bottom
+	  translate([2*wall, 2*wall, -$over]){
+	    main_shape(back_size = [back_size.x-(4*wall), back_size.y-(4*wall), back_size.z-wall+$over],
+		       front_size = [front_size.x-(2*wall), front_size.y-(4*wall), front_size.z-wall+$over],
+		       corner_r = corner_r, back_corner_r = back_corner_r);
 	  }
-	  translate([wall+back_lip, back_size.y-(wall+$over), -$over]){
-	    cube([size.x+step.x-(2*wall)-(2*back_lip)-(2*tab_length), wall+(2*$over), front_size.z+$over-max(wall, back_lip)]);
+	  //cut back out of main section
+	  translate([back_lip+wall, back_size.y-(wall+$over), max(wall, back_lip)]){
+	    cube([back_size.x-(2*wall)-(2*back_lip), wall+(2*$over), back_size.z-(2*max(wall, back_lip))]);
+	  }
+	  //cut back out of step section
+	  translate([wall+back_lip, back_size.y-(wall+$over), max(wall, back_lip)]){
+	    cube([size.x+step.x-(2*wall)-(2*back_lip)-(2*tab_length), wall+(2*$over), front_size.z-(2*max(wall, back_lip))]);
 	  }
 
 	  //Fuse Holder
