@@ -24,7 +24,7 @@ use <libraries/UnfyOpenSCADLib/cutouts/unfy_popins.scad>
 use <libraries/UnfyOpenSCADLib/cutouts/unfy_dhole.scad>
 use <libraries/UnfyOpenSCADLib/unfy_cablemanagement.scad>
 
-part = "TopSupplyCornerBracket"; // ["PowerSocketBox", "TopSupplyCornerBracket"]
+part = "PowerSupplyBracket"; // ["PowerSocketBox", "PowerSwitchBox", "PowerSupplyBracket"]
 
 support_skin = 0.6;
 
@@ -48,12 +48,18 @@ psb_top_cable_bolt = "M3"; //["M3", "M4", "#6"]
 psb_bottom_cable_d = 7.5;
 psb_bottom_cable_bolt = "M3"; //["M3", "M4", "#6"]
 
+/* [Power Supply Bracket] */
+bkt_supply_bolt_size = "M4"; // ["M3", "M4", "#4", "#6", "#8"]
+bkt_supply_bolt_position = 11;
+bkt_mount_bolt_size = "#6"; // ["M3", "M4", "#4", "#6", "#8"]
+bkt_mount_bolt_position = 13;
+
 /* [ advanced ] */
 wall = 4;
 $fn = $preview ? 36 : 360;
 $over = 0.01;
 
-module power_box(step=[20, 27],
+module power_socket_box(step=[20, 27],
 		 bolt_size = "m4",
 		 back_lip = 5,
 		 top_cable_d,
@@ -100,7 +106,7 @@ module power_box(step=[20, 27],
 	unf_bezierWedge3d(size=[wall, wall, tab_length+(2*wall)]);
 	for(y=[0, tab_length+wall]){
 	  translate([0, y, 0]){
-	    unf_bezierWedge3d(size=[tab_length-wall, tab_length-wall, wall], rounded_edges=2);
+	    unf_bezierWedge3d(size=[tab_length-wall, tab_length-wall, wall], rounded_edges=wall/2);
 	  }
 	}
       }
@@ -207,21 +213,100 @@ module power_box(step=[20, 27],
   }
 }
 
+module power_supply_bracket(supply_bolt_size = "M4",
+			    supply_bolt_position = 11,
+			    mount_bolt_size = "#6",
+			    mount_bolt_position = 11,
+			    wall = 4){
+  let(supply_washer_v = unf_wsh_v(supply_bolt_size),
+      supply_washer_d = unf_wsh_diameter(supply_washer_v),
+      supply_bolt_d = unf_fnr_shaft_diameter(supply_bolt_size),
+      mount_washer_v = unf_wsh_v(mount_bolt_size),
+      mount_washer_d = unf_wsh_diameter(mount_washer_v),
+      mount_bolt_d = unf_fnr_shaft_diameter(mount_bolt_size),
+      width = max(supply_washer_d, mount_washer_d) + (4*wall), //4*wall = 2 wall-widthed webs + 2 wall-widthed outer edges
+      supply_length = supply_bolt_position + (supply_washer_d / 2) + wall,
+      mount_length = mount_bolt_position + (mount_washer_d / 2) + wall, //2*wall = wall taken up by width of supply_side + wall-widthed outer edge
+      round_edge = wall / 4) {
+    translate([0, -mount_length, 0]){
+      difference(){
+	unf_roundedCuboid(size=[width, mount_length, wall], edge_r=[round_edge, round_edge, 0, round_edge, 0, 0, 0, 0], corners=[wall, wall, 0, 0]);
+	translate([width/2, mount_length-mount_bolt_position, 0]){
+	  translate([0, 0, wall+$over]){
+	    rotate([0, 180, 0]){
+	      unf_wsh(size=mount_washer_v, ext=$over);
+	    }
+	  }
+	  translate([0, 0, -$over]){
+	    cylinder(d=mount_bolt_d, h=wall+(2*$over));
+	  }
+	}
+      }
+    }
+    translate([0, -wall, 0]){
+      rotate([-90, 0, 0]){
+	translate([0, -(supply_length), 0]){
+	  difference(){
+	    union(){
+	      unf_roundedCuboid(size=[width, supply_length, wall], edge_r=[0, 0, 0, 0, round_edge, round_edge, 0, round_edge], corners=[wall, wall, 0, 0]);
+	      translate([2*wall, supply_length-wall, 0]){
+		rotate([0, 90, -90]){
+		  unf_bezierWedge3d(size=[wall, wall, width-(4*wall)]);
+		}
+	      }
+	    }
+	    translate([width/2, supply_bolt_position, $over]){
+	      translate([0, 0, 0]){
+		unf_wsh(size=supply_washer_v, ext=wall/2);
+	      }
+	      translate([0, 0, -$over]){
+		cylinder(d=supply_bolt_d, h=wall+(2*$over));
+	      }
+	    }
+	  }
+	}
+      }
+    }
+    for(x = [wall, width-(2*wall)]){
+      translate([x, -wall, wall]){
+	rotate([0, 0, -90]){
+	  unf_bezierWedge3d(size=[mount_length-wall, supply_length-wall, wall], rounded_edges=wall/2);
+	}
+      }
+    }
+  }
+}
 
-power_box(bolt_size = psb_bolt_size,
-	  top_cable_d = psb_top_cable_d,
-	  top_cable_bolt = psb_top_cable_bolt,
-	  bottom_cable_d = psb_bottom_cable_d,
-	  bottom_cable_bolt = psb_bottom_cable_bolt,
-	  socket_fastener=psb_socket_fastener,
-	  socket_fastener_size=psb_socket_fastener,
-	  fuse_holder_hole_diameter = psb_fuse_holder_hole_diameter,
-	  fuse_holder_outer_diameter = psb_fuse_holder_outer_diameter,
-	  fuse_holder_spacing = psb_fuse_holder_spacing,
-	  fuse_holder_hole_shape = psb_fuse_holder_hole_shape,
-	  fuse_holder_flat_width = psb_fuse_holder_flat_width,
-	  fuse_holder_rotation = psb_fuse_holder_rotation,
-	  support_skin = support_skin,
-	  wall = wall);
+
+if ("PowerSocketBox" == part){
+
+  power_socket_box(bolt_size = psb_bolt_size,
+	    top_cable_d = psb_top_cable_d,
+	    top_cable_bolt = psb_top_cable_bolt,
+	    bottom_cable_d = psb_bottom_cable_d,
+	    bottom_cable_bolt = psb_bottom_cable_bolt,
+	    socket_fastener=psb_socket_fastener,
+	    socket_fastener_size=psb_socket_fastener,
+	    fuse_holder_hole_diameter = psb_fuse_holder_hole_diameter,
+	    fuse_holder_outer_diameter = psb_fuse_holder_outer_diameter,
+	    fuse_holder_spacing = psb_fuse_holder_spacing,
+	    fuse_holder_hole_shape = psb_fuse_holder_hole_shape,
+	    fuse_holder_flat_width = psb_fuse_holder_flat_width,
+	    fuse_holder_rotation = psb_fuse_holder_rotation,
+	    support_skin = support_skin,
+	    wall = wall);
+ } else if ("PowerSupplyBracket" == part){
+  power_supply_bracket(supply_bolt_size = bkt_supply_bolt_size,
+		       supply_bolt_position = bkt_supply_bolt_position,
+		       mount_bolt_size = bkt_mount_bolt_size,
+		       mount_bolt_position = bkt_mount_bolt_position,
+		       wall = wall
+  );
+
+
+  
+ } else if ("PowerSwitchBox" == part){
+
+ }
 
 
