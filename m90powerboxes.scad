@@ -255,7 +255,7 @@ module power_supply_bracket(supply_bolt_size = "M4",
 		}
 	      }
 	    }
-	    translate([width/2, supply_bolt_position, $over]){
+	    translate([width/2, supply_length-supply_bolt_position, $over]){
 	      translate([0, 0, 0]){
 		unf_wsh(size=supply_washer_v, ext=wall/2);
 	      }
