@@ -281,7 +281,7 @@ module power_supply_bracket(supply_bolt_size = "M4",
   }
 }
 
-module power_switch_box(angle=45, corner=5, edge=2, device="RLEIL_R2", fastener_spacing=100, fastener_size="#6", wall=2){
+module power_switch_box(angle=45, corner=5, edge=2, device="RLEIL_R2", fastener_spacing=100, fastener_size="#6", body_color="Blue", support_color="Yellow", wall=2){
   let(switch_d = unf_Popin_Dims(device = device),
       face_width = switch_d.y+(2*max(corner, wall)),
       face_length = switch_d.x+(2*max(corner, wall)),
@@ -297,14 +297,17 @@ module power_switch_box(angle=45, corner=5, edge=2, device="RLEIL_R2", fastener_
   ) {
 
     difference(){
-      intersection(){
-	union(){
-	  color(body_color){
-	    unf_roundedCuboid(size=base, corners=corner, edge_r=[edge, 0]);
-	    translate([base_depth-edge, 0, base_height]){
-	      rotate([0, angle-90, 0]){
-		translate([-face_depth, (base_width/2)-(face_width/2), 0]){
-		  unf_Popin(location=[face.x, (face.y/2)-(switch_d.y/2),(face.z/2)-(switch_d.x/2)], rotation=[0, -90, 0], device=device, wall=wall, body_color=body_color, support_color=support_color, support_skin=support_skin){
+      union(){
+	//base
+	color(body_color){
+	  unf_roundedCuboid(size=base, corners=corner, edge_r=[edge, 0]);
+	}
+	intersection(){
+	  translate([base_depth-edge, 0, base_height]){
+	    rotate([0, angle-90, 0]){
+	      translate([-face_depth, (base_width/2)-(face_width/2), 0]){
+		unf_Popin(location=[face.x, (face.y/2)-(switch_d.y/2),(face.z/2)-(switch_d.x/2)], rotation=[0, -90, 0], device=device, wall=wall, body_color=body_color, support_color=support_color, support_skin=support_skin){
+		  color(body_color){
 		    difference(){
 		      unf_roundedCuboid(size=face, corners=[0, corner, corner, 0], edge_r=[edge, 0]);
 		      translate([-$over, wall, wall]){
@@ -315,28 +318,33 @@ module power_switch_box(angle=45, corner=5, edge=2, device="RLEIL_R2", fastener_
 		}
 	      }
 	    }
-	    translate([0, (base.y/2)-(face.y/2), 0]){
-	      z = (90==angle) ? base.z+face.z-corner : ((((face.z)/cos(angle))-(base.x-edge))*tan(90-angle))+base.z-corner;
-	      echo(str("here: ", z));
-	      cube([wall, face.y, z]);
+	  }
+	  translate([0, 0, 0]){
+	    color(body_color){
+	      cube([2*dimMax, 2*dimMax, dimMax]);
 	    }
 	  }
 	}
-	translate([0, 0, 0]){
-	  cube([2*dimMax, 2*dimMax, dimMax]);
+	// Backing
+	color(body_color){
+	  translate([0, (base.y/2)-(face.y/2), 0]){
+	    z = (90==angle) ? base.z+face.z-edge : ((((face.z)/cos(angle))-(base.x-edge))*tan(90-angle))+base.z-edge;
+	    cube([wall, face.y, z]);
+	  }
 	}
       }
+      //base opening
       translate([wall, wall, -$over]){
 	unf_roundedCuboid(size=[base.x-(2*wall), base.y-(2*wall), base.z-wall+$over], corners=corner, edge_r=[edge, 0]);
       }
-      color(body_color){
-	translate([edge, (base.y/2)-((face.y-(2*wall))/2), 0]){
-	  cube([base.x-(2*edge)-corner, face.y-(2*wall), base.z+$over]);
-	}
+      //opening between base and head
+      translate([wall, (base.y/2)-((face.y-(2*wall))/2), 0]){
+	cube([base.x-(2*wall)-(2*edge)-corner, face.y-(2*wall), base.z+wall+$over]);
       }
     }
   }
 }
+
 
 if ("PowerSocketBox" == part){
 
@@ -370,6 +378,8 @@ if ("PowerSocketBox" == part){
 		   device=pwb_device,
 		   fastener_spacing=pwb_fastener_spacing,
 		   fastener_size = pwb_fastener_size,
+		   body_color=body_color,
+		   support_color=support_color,
 		   wall = wall);
  }
 
