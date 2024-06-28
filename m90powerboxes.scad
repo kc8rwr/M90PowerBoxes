@@ -24,7 +24,7 @@ use <libraries/UnfyOpenSCADLib/cutouts/unfy_popins.scad>
 use <libraries/UnfyOpenSCADLib/cutouts/unfy_dhole.scad>
 use <libraries/UnfyOpenSCADLib/unfy_cablemanagement.scad>
 
-part = "PowerSwitchBox"; // ["PowerSocketBox", "PowerSwitchBox", "PowerSupplyBracket"]
+part = "PowerSocketBox"; // ["PowerSocketBox", "PowerSwitchBox", "PowerSupplyBracket"]
 
 support_skin = 0.6;
 
@@ -228,6 +228,7 @@ module power_supply_bracket(supply_bolt_size = "M4",
 			    supply_bolt_position = 11,
 			    mount_bolt_size = "#6",
 			    mount_bolt_position = 11,
+			    body_color = false,
 			    wall = 4){
   let(supply_washer_v = unf_wsh_v(supply_bolt_size),
       supply_washer_d = unf_wsh_diameter(supply_washer_v),
@@ -239,49 +240,51 @@ module power_supply_bracket(supply_bolt_size = "M4",
       supply_length = supply_bolt_position + (supply_washer_d / 2) + wall,
       mount_length = mount_bolt_position + (mount_washer_d / 2) + wall, //2*wall = wall taken up by width of supply_side + wall-widthed outer edge
       round_edge = wall / 4) {
-    translate([0, -mount_length, 0]){
-      difference(){
-	unf_roundedCuboid(size=[width, mount_length, wall], edge_r=[round_edge, round_edge, 0, round_edge, 0, 0, 0, 0], corners=[wall, wall, 0, 0]);
-	translate([width/2, mount_length-mount_bolt_position, 0]){
-	  translate([0, 0, wall+$over]){
-	    rotate([0, 180, 0]){
-	      unf_wsh(size=mount_washer_v, ext=$over);
+    color(body_color){
+      translate([0, -mount_length, 0]){
+	difference(){
+	  unf_roundedCuboid(size=[width, mount_length, wall], edge_r=[round_edge, round_edge, 0, round_edge, 0, 0, 0, 0], corners=[wall, wall, 0, 0]);
+	  translate([width/2, mount_length-mount_bolt_position, 0]){
+	    translate([0, 0, wall+$over]){
+	      rotate([0, 180, 0]){
+		unf_wsh(size=mount_washer_v, ext=$over);
+	      }
 	    }
-	  }
-	  translate([0, 0, -$over]){
-	    cylinder(d=mount_bolt_d, h=wall+(2*$over));
+	    translate([0, 0, -$over]){
+	      cylinder(d=mount_bolt_d, h=wall+(2*$over));
+	    }
 	  }
 	}
       }
-    }
-    translate([0, -wall, 0]){
-      rotate([-90, 0, 0]){
-	translate([0, -(supply_length), 0]){
-	  difference(){
-	    union(){
-	      unf_roundedCuboid(size=[width, supply_length, wall], edge_r=[0, 0, 0, 0, round_edge, round_edge, 0, round_edge], corners=[wall, wall, 0, 0]);
-	      translate([2*wall, supply_length-wall, 0]){
-		rotate([0, 90, -90]){
-		  unf_bezierWedge3d(size=[wall, wall, width-(4*wall)]);
+      translate([0, -wall, 0]){
+	rotate([-90, 0, 0]){
+	  translate([0, -(supply_length), 0]){
+	    difference(){
+	      union(){
+		unf_roundedCuboid(size=[width, supply_length, wall], edge_r=[0, 0, 0, 0, round_edge, round_edge, 0, round_edge], corners=[wall, wall, 0, 0]);
+		translate([2*wall, supply_length-wall, 0]){
+		  rotate([0, 90, -90]){
+		    unf_bezierWedge3d(size=[wall, wall, width-(4*wall)]);
+		  }
+		}
+	      }
+	      translate([width/2, supply_length-supply_bolt_position, $over]){
+		translate([0, 0, 0]){
+		  unf_wsh(size=supply_washer_v, ext=wall/2);
+		}
+		translate([0, 0, -$over]){
+		  cylinder(d=supply_bolt_d, h=wall+(2*$over));
 		}
 	      }
 	    }
-	    translate([width/2, supply_length-supply_bolt_position, $over]){
-	      translate([0, 0, 0]){
-		unf_wsh(size=supply_washer_v, ext=wall/2);
-	      }
-	      translate([0, 0, -$over]){
-		cylinder(d=supply_bolt_d, h=wall+(2*$over));
-	      }
-	    }
 	  }
 	}
       }
-    }
-    for(x = [wall, width-(2*wall)]){
-      translate([x, -wall, wall]){
-	rotate([0, 0, -90]){
-	  unf_bezierWedge3d(size=[mount_length-wall, supply_length-wall, wall], rounded_edges=wall/2);
+      for(x = [wall, width-(2*wall)]){
+	translate([x, -wall, wall]){
+	  rotate([0, 0, -90]){
+	    unf_bezierWedge3d(size=[mount_length-wall, supply_length-wall, wall], rounded_edges=wall/2);
+	  }
 	}
       }
     }
@@ -373,15 +376,6 @@ module power_switch_box(angle=45, corner=5, edge=2, device="RLEIL_R2", device_sp
       //base support skin
       if (0 < support_skin){
 	color(support_color){
-	  /*translate([(2*wall)-support_skin, (base.y/2)-((face.y-(2*wall))/2)-support_skin, 0]){
-	    difference(){
-	      cube([base.x-(3*wall)-(2*edge)-corner+(2*support_skin), face.y-(2*wall)+(2*support_skin), base.z]);
-	      translate([support_skin, support_skin, -$over]){
-		cube([base.x-(3*wall)-(2*edge)-corner, face.y-(2*wall), base.z+(2*$over)]);
-	      }
-	    }
-	  }*/
-
 	  translate([2*wall, (base.y/2)-((face.y-(2*wall))/2), 0]){
 	    cube([base.x-(4*wall), support_skin, base.z-wall]);
 	  }
@@ -423,6 +417,7 @@ if ("PowerSocketBox" == part){
 		       supply_bolt_position = bkt_supply_bolt_position,
 		       mount_bolt_size = bkt_mount_bolt_size,
 		       mount_bolt_position = bkt_mount_bolt_position,
+		       body_color = body_color,
 		       wall = wall
   );
 
@@ -443,5 +438,3 @@ if ("PowerSocketBox" == part){
 		   max_skinless_angle = pwb_max_skinless_angle,
 		   wall = wall);
  }
-
-
