@@ -49,7 +49,7 @@ psb_bottom_cable_d = 7.5;
 psb_bottom_cable_bolt = "M3"; //["M3", "M4", "#6"]
 
 /* [Power Switch Box] */
-pwb_angle = 45; //[0:90]
+pwb_angle = 25; //[0:90]
 pwb_max_skinless_angle = 50; //[0:90]
 pwb_device="RLEIL_R2 | RLEIL_R2-Rleil R2 Series Switch"; //["RLEIL_R2 | RLEIL_R2-Rleil R2 Series Switch"]
 pwb_device_space_z = 4;
@@ -369,24 +369,18 @@ module power_switch_box(angle=45, corner=5, edge=2, device="RLEIL_R2", device_sp
 	  unf_roundedCuboid(size=[base.x-(2*wall), base.y-(2*wall), base.z-wall+$over], corners=corner, edge_r=[edge, 0]);
 	}
 	//opening between base and head
-	translate([(2*wall), (base.y/2)-((face.y-(2*wall))/2), 0]){
-	  cube([base.x-(3*wall)-(2*edge)-corner, face.y-(2*wall), base.z+wall+$over]);
+	translate([max(wall, edge), (base.y/2)-((face.y-(2*wall))/2), 0]){
+	  cube([base.x-(2*max(wall,edge)), face.y-(2*wall), base.z+$over]);
 	}
       }
       //base support skin
       if (0 < support_skin){
 	color(support_color){
-	  translate([2*wall, (base.y/2)-((face.y-(2*wall))/2), 0]){
-	    cube([base.x-(4*wall), support_skin, base.z-wall]);
+	  translate([max(wall, edge)+support_skin, (base.y/2)-((face.y-(2*wall))/2), 0]){
+	    cube([base.x-(2*(max(wall, edge)+support_skin)), support_skin, base.z-wall]);
 	  }
-	  translate([2*wall, (base.y/2)+((face.y-(2*wall))/2), 0]){
-	    cube([base.x-(4*wall), support_skin, base.z-wall]);
-	  }
-	  translate([2*wall, (2*wall), 0]){
-	    cube([support_skin, base.y-(4*wall), base.z-wall]);
-	  }
-	  translate([base.x-wall-(2*edge)-corner, (2*wall), 0]){
-	    cube([support_skin, base.y-(4*wall), base.z-wall]);
+	  translate([max(wall, edge)+support_skin, (base.y/2)+((face.y-(2*wall))/2), 0]){
+	    cube([base.x-(2*(max(wall, edge)+support_skin)), support_skin, base.z-wall]);
 	  }
 	}
       }
